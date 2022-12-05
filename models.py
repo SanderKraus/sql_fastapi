@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from database import Base
 
 
 class User(Base):
@@ -24,3 +24,10 @@ class Item(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="items")
+
+
+class Sport(Base):
+    __tablename__ = "sports"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sportname = Column(String, index=True)

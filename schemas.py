@@ -33,3 +33,18 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class SportBase(BaseModel):
+    sportname: str
+
+
+class SportCreate(SportBase):
+    pass 
+
+
+class Sport(SportBase):
+    id: int
+
+    class Config:
+        orm_mode = True

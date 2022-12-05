@@ -1,8 +1,9 @@
 from fastapi import Depends, FastAPI, HTTPException, responses, encoders, Request
 from sqlalchemy.orm import Session
+import crud, models, schemas
 
-from . import crud, models, schemas
-from .database import SessionLocal, engine
+# from . import crud, models, schemas
+from database import SessionLocal, engine
 
 import requests, asyncio
 import httpx
@@ -13,7 +14,7 @@ app = FastAPI()
 
 
 # Dependency
-def get_db():
+def get_db():   
     db = SessionLocal()
     try:
         yield db
@@ -27,6 +28,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=user)
+
+
+@app.post("/sport/", response_model=schemas.Sport)
+def post_test(sport: schemas.SportCreate, db: Session = Depends(get_db)):
+    db_sport = crud.get_sport_by_name(db, name=sport.sportname)
+    if db_sport:
+        raise HTTPException(status_code=400, detail="Sport already registered")
+    return crud.create_sport(db=db, sport=sport)
 
 
 @app.get("/users/", response_model=list[schemas.User])
@@ -65,8 +74,6 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Dieser User wurde nicht in der Datenbank gefunden!")
     return db_user
 
-print('-------')
-print(read_user(1))
 
 @app.post("/users/{user_id}/items/", response_model=schemas.Item)
 def create_item_for_user(
@@ -79,3 +86,8 @@ def create_item_for_user(
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
+
+
+@app.get("testget/")
+def get_test(user_id: int):
+    return {user_id}
